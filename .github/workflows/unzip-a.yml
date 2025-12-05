@@ -1,0 +1,37 @@
+name: 解压a.zip到根目录
+on:
+  # 可根据需要选择触发时机，比如推送代码时触发
+  push:
+    branches: [main]
+  # 也可以手动触发
+  workflow_dispatch:
+
+jobs:
+  unzip:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 拉取仓库代码
+        uses: actions/checkout@v4
+
+      - name: 解压a.zip
+        run: |
+          # 检查a.zip是否存在
+          if [ ! -f "tianhu-runner(1).zip" ]; then
+            echo "错误：根目录下未找到a.zip文件"
+            exit 1
+          fi
+          # 解压到根目录（覆盖已有文件）
+          unzip -o tianhu-runner(1).zip -d ./
+
+      - name: 提交解压后的文件
+        run: |
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@github.com"
+          # 检查是否有文件变化
+          if git status --porcelain | grep .; then
+            git add .
+            git commit -m "自动解压a.zip到根目录"
+            git push
+          else
+            echo "没有新文件需要提交"
+          fi
