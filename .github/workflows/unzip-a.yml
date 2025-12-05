@@ -1,6 +1,6 @@
-name: 解压tianhu-runner(1).zip到根目录
+name: 解压tianhu-runner-1.zip到根目录
 on:
-  workflow_dispatch: # 仅保留手动触发，如需其他触发可自行添加
+  workflow_dispatch:
 
 jobs:
   unzip-tianhu-package:
@@ -9,29 +9,25 @@ jobs:
       - name: 拉取仓库代码
         uses: actions/checkout@v4
 
-      - name: 检查压缩包是否存在
+      - name: 调试-列出根目录文件
+        run: ls -la ./
+
+      - name: 检查并解压压缩包
         run: |
-          ZIP_FILE="tianhu-runner(1).zip"
+          ZIP_FILE="tianhu-runner.zip"
           if [ ! -f "$ZIP_FILE" ]; then
-            echo "错误：根目录下未找到${ZIP_FILE}文件"
+            echo "错误：未找到${ZIP_FILE}"
             exit 1
           fi
+          unzip -o "$ZIP_FILE" -d ./
 
-      - name: 解压tianhu-runner(1).zip到根目录
-        run: |
-          ZIP_FILE="tianhu-runner(1).zip"
-          unzip -o "$ZIP_FILE" -d ./ # -o 自动覆盖已有文件
-
-      - name: 提交解压后的文件到仓库
+      - name: 提交解压文件
         run: |
           git config --global user.name "GitHub Action"
           git config --global user.email "action@github.com"
-          # 检测文件变更并提交
           if git status --porcelain | grep .; then
             git add .
-            git commit -m "chore: 自动解压tianhu-runner(1).zip到根目录"
+            git commit -m "chore: 解压tianhu压缩包"
             git push
-          else
-            echo "无文件变更，无需提交"
           fi
           fi
